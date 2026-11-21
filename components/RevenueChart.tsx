@@ -45,157 +45,182 @@ export default function RevenueChart() {
       className="revenue-chart"
       viewBox="0 0 820 270"
       role="group"
-      aria-labelledby="revenue-chart-title"
-      aria-describedby="revenue-chart-description"
-      onMouseLeave={() => setHoverIndex(null)}
+      aria-label="Interactive revenue chart"
+      onPointerLeave={() => setHoverIndex(null)}
     >
-      <title id="revenue-chart-title">Cumulative cross-sell revenue versus investment model</title>
-      <desc id="revenue-chart-description">
-        Cumulative cross-sell revenue from January to October 2026. Actual revenue reaches $612K
-        against a modeled $780K. Focus or select a month for details.
-      </desc>
-
-      <g stroke="#ECECE8" strokeWidth="1">
-        {Y_AXIS_VALUES.map((value) => (
-          <line
-            key={value}
-            x1={PLOT.left}
-            y1={yFor(value)}
-            x2="800"
-            y2={yFor(value)}
-          />
-        ))}
-      </g>
-
       <g
-        fontFamily="Space Mono, monospace"
-        fontSize="11"
-        fill="#6E727C"
-        textAnchor="end"
+        role="img"
+        aria-labelledby="revenue-chart-title"
+        aria-describedby="revenue-chart-description"
       >
-        {Y_AXIS_VALUES.map((value) => (
-          <text key={value} x="48" y={yFor(value) + 4}>
-            {value === 0 ? '$0' : `$${value}K`}
-          </text>
-        ))}
-      </g>
+        <title id="revenue-chart-title">
+          Cumulative cross-sell revenue versus investment model
+        </title>
+        <desc id="revenue-chart-description">
+          Cumulative cross-sell revenue from January to October 2026. Actual revenue reaches $612K
+          against a modeled $780K. Focus or select a month for details.
+        </desc>
 
-      <g
-        fontFamily="Space Mono, monospace"
-        fontSize="11"
-        fill="#6E727C"
-        textAnchor="middle"
-      >
-        {REVENUE_DATA.map((item, index) => (
-          <text key={item.month} x={xFor(index)} y="254">
-            {item.shortMonth}
-          </text>
-        ))}
-      </g>
-
-      <polyline
-        fill="none"
-        stroke="#8A8F99"
-        strokeWidth="2"
-        strokeDasharray="6 5"
-        points={pointsFor('model')}
-      />
-      <polyline
-        fill="none"
-        stroke="#F26322"
-        strokeWidth="2.5"
-        points={pointsFor('actual')}
-      />
-
-      <circle
-        cx={xFor(REVENUE_DATA.length - 1)}
-        cy={yFor(REVENUE_DATA.at(-1)!.actual)}
-        r="4.5"
-        fill="#F26322"
-      />
-      <circle
-        cx={xFor(REVENUE_DATA.length - 1)}
-        cy={yFor(REVENUE_DATA.at(-1)!.model)}
-        r="3.5"
-        fill="#FFFFFF"
-        stroke="#8A8F99"
-        strokeWidth="2"
-      />
-      <g fontFamily="Space Mono, monospace" fontSize="11" textAnchor="end">
-        <text x="770" y={yFor(REVENUE_DATA.at(-1)!.actual) + 19} fill="#B3440F">
-          $612K
-        </text>
-        <text x="770" y={yFor(REVENUE_DATA.at(-1)!.model) - 9} fill="#6E727C">
-          $780K
-        </text>
-      </g>
-
-      {selected && selectedX !== null && (
-        <g pointerEvents="none">
-          <line
-            className="chart-guide"
-            x1={selectedX}
-            y1={PLOT.top}
-            x2={selectedX}
-            y2={PLOT.bottom}
-            stroke="#3D4048"
-            strokeWidth="1"
-            opacity="0.45"
-          />
-          <circle
-            cx={selectedX}
-            cy={yFor(selected.model)}
-            r="5"
-            fill="#FFFFFF"
-            stroke="#8A8F99"
-            strokeWidth="2.5"
-          />
-          <circle
-            cx={selectedX}
-            cy={yFor(selected.actual)}
-            r="5.5"
-            fill="#F26322"
-            stroke="#FFFFFF"
-            strokeWidth="2"
-          />
-
-          <g
-            className="chart-tooltip"
-            transform={`translate(${selectedX > 600 ? selectedX - 176 : selectedX + 12}, 28)`}
-          >
-            <rect width="164" height="102" rx="5" fill="#24262B" />
-            <text
-              x="12"
-              y="20"
-              fill="#FFFFFF"
-              fontFamily="Space Mono, monospace"
-              fontSize="11"
-              fontWeight="700"
-            >
-              {selected.month}
-            </text>
-            <circle cx="16" cy="40" r="3.5" fill="#F26322" />
-            <text x="28" y="44" fill="#FFFFFF" fontFamily="Space Mono, monospace" fontSize="11">
-              Actual ${selected.actual}K
-            </text>
+        <g stroke="#ECECE8" strokeWidth="1">
+          {Y_AXIS_VALUES.map((value) => (
             <line
-              x1="12"
-              y1="61"
-              x2="22"
-              y2="61"
-              stroke="#A8ABB2"
-              strokeWidth="2"
-              strokeDasharray="3 2"
+              key={value}
+              x1={PLOT.left}
+              y1={yFor(value)}
+              x2="800"
+              y2={yFor(value)}
             />
-            <text x="28" y="65" fill="#FFFFFF" fontFamily="Space Mono, monospace" fontSize="11">
-              Model ${selected.model}K
-            </text>
-            <text x="12" y="87" fill="#FFFFFF" fontFamily="Space Mono, monospace" fontSize="11">
-              Gap ${selected.model - selected.actual}K
-            </text>
-          </g>
+          ))}
         </g>
-      )}
+
+        <g
+          fontFamily="Space Mono, monospace"
+          fontSize="11"
+          fill="#6E727C"
+          textAnchor="end"
+        >
+          {Y_AXIS_VALUES.map((value) => (
+            <text key={value} x="48" y={yFor(value) + 4}>
+              {value === 0 ? '$0' : `$${value}K`}
+            </text>
+          ))}
+        </g>
+
+        <g
+          fontFamily="Space Mono, monospace"
+          fontSize="11"
+          fill="#6E727C"
+          textAnchor="middle"
+        >
+          {REVENUE_DATA.map((item, index) => (
+            <text key={item.month} x={xFor(index)} y="254">
+              {item.shortMonth}
+            </text>
+          ))}
+        </g>
+
+        <polyline
+          fill="none"
+          stroke="#8A8F99"
+          strokeWidth="2"
+          strokeDasharray="6 5"
+          points={pointsFor('model')}
+        />
+        <polyline
+          fill="none"
+          stroke="#F26322"
+          strokeWidth="2.5"
+          points={pointsFor('actual')}
+        />
+
+        <circle
+          cx={xFor(REVENUE_DATA.length - 1)}
+          cy={yFor(REVENUE_DATA.at(-1)!.actual)}
+          r="4.5"
+          fill="#F26322"
+        />
+        <circle
+          cx={xFor(REVENUE_DATA.length - 1)}
+          cy={yFor(REVENUE_DATA.at(-1)!.model)}
+          r="3.5"
+          fill="#FFFFFF"
+          stroke="#8A8F99"
+          strokeWidth="2"
+        />
+        <g fontFamily="Space Mono, monospace" fontSize="11" textAnchor="end">
+          <text x="770" y={yFor(REVENUE_DATA.at(-1)!.actual) + 19} fill="#B3440F">
+            $612K
+          </text>
+          <text x="770" y={yFor(REVENUE_DATA.at(-1)!.model) - 9} fill="#6E727C">
+            $780K
+          </text>
+        </g>
+
+        {selected && selectedX !== null && (
+          <g pointerEvents="none">
+            <line
+              className="chart-guide"
+              x1={selectedX}
+              y1={PLOT.top}
+              x2={selectedX}
+              y2={PLOT.bottom}
+              stroke="#3D4048"
+              strokeWidth="1"
+              opacity="0.45"
+            />
+            <circle
+              cx={selectedX}
+              cy={yFor(selected.model)}
+              r="5"
+              fill="#FFFFFF"
+              stroke="#8A8F99"
+              strokeWidth="2.5"
+            />
+            <circle
+              cx={selectedX}
+              cy={yFor(selected.actual)}
+              r="5.5"
+              fill="#F26322"
+              stroke="#FFFFFF"
+              strokeWidth="2"
+            />
+
+            <g
+              className="chart-tooltip"
+              transform={`translate(${selectedX > 600 ? selectedX - 176 : selectedX + 12}, 28)`}
+            >
+              <rect width="164" height="102" rx="5" fill="#24262B" />
+              <text
+                x="12"
+                y="20"
+                fill="#FFFFFF"
+                fontFamily="Space Mono, monospace"
+                fontSize="11"
+                fontWeight="700"
+              >
+                {selected.month}
+              </text>
+              <circle cx="16" cy="40" r="3.5" fill="#F26322" />
+              <text
+                x="28"
+                y="44"
+                fill="#FFFFFF"
+                fontFamily="Space Mono, monospace"
+                fontSize="11"
+              >
+                Actual ${selected.actual}K
+              </text>
+              <line
+                x1="12"
+                y1="61"
+                x2="22"
+                y2="61"
+                stroke="#A8ABB2"
+                strokeWidth="2"
+                strokeDasharray="3 2"
+              />
+              <text
+                x="28"
+                y="65"
+                fill="#FFFFFF"
+                fontFamily="Space Mono, monospace"
+                fontSize="11"
+              >
+                Model ${selected.model}K
+              </text>
+              <text
+                x="12"
+                y="87"
+                fill="#FFFFFF"
+                fontFamily="Space Mono, monospace"
+                fontSize="11"
+              >
+                Gap ${selected.model - selected.actual}K
+              </text>
+            </g>
+          </g>
+        )}
+      </g>
 
       <g>
         {REVENUE_DATA.map((item, index) => {
@@ -217,7 +242,11 @@ export default function RevenueChart() {
               role="button"
               aria-label={`${item.month}: Actual $${item.actual}K, Model $${item.model}K, gap $${item.model - item.actual}K`}
               onPointerEnter={() => setHoverIndex(index)}
-              onFocus={() => setPersistentIndex(index)}
+              onPointerMove={() => setHoverIndex(index)}
+              onFocus={() => {
+                setPersistentIndex(index);
+                setHoverIndex(null);
+              }}
               onClick={() => setPersistentIndex(index)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
