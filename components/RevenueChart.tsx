@@ -32,6 +32,9 @@ const pointsFor = (key: 'actual' | 'model') =>
 
 const Y_AXIS_VALUES = [0, 200, 400, 600, 800];
 const COLUMN_WIDTH = (PLOT.right - PLOT.left) / (REVENUE_DATA.length - 1);
+const TOOLTIP_WIDTH = 200;
+const TOOLTIP_GAP = 12;
+const SVG_WIDTH = 820;
 
 export default function RevenueChart() {
   const [persistentIndex, setPersistentIndex] = useState<number | null>(null);
@@ -167,9 +170,13 @@ export default function RevenueChart() {
 
             <g
               className="chart-tooltip"
-              transform={`translate(${selectedX > 600 ? selectedX - 176 : selectedX + 12}, 28)`}
+              transform={`translate(${
+                selectedX + TOOLTIP_GAP + TOOLTIP_WIDTH > SVG_WIDTH
+                  ? selectedX - TOOLTIP_WIDTH - TOOLTIP_GAP
+                  : selectedX + TOOLTIP_GAP
+              }, 28)`}
             >
-              <rect width="164" height="102" rx="5" fill="#24262B" />
+              <rect width={TOOLTIP_WIDTH} height="102" rx="5" fill="#24262B" />
               <text
                 x="12"
                 y="20"
