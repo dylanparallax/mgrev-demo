@@ -42,8 +42,8 @@ export default function RevenueChart() {
 
   return (
     <svg
+      className="revenue-chart"
       viewBox="0 0 820 270"
-      style={{ width: '100%', height: 'auto', display: 'block' }}
       role="group"
       aria-labelledby="revenue-chart-title"
       aria-describedby="revenue-chart-description"
@@ -133,6 +133,7 @@ export default function RevenueChart() {
       {selected && selectedX !== null && (
         <g pointerEvents="none">
           <line
+            className="chart-guide"
             x1={selectedX}
             y1={PLOT.top}
             x2={selectedX}
@@ -158,7 +159,10 @@ export default function RevenueChart() {
             strokeWidth="2"
           />
 
-          <g transform={`translate(${selectedX > 600 ? selectedX - 176 : selectedX + 12}, 28)`}>
+          <g
+            className="chart-tooltip"
+            transform={`translate(${selectedX > 600 ? selectedX - 176 : selectedX + 12}, 28)`}
+          >
             <rect width="164" height="102" rx="5" fill="#24262B" />
             <text
               x="12"
@@ -202,6 +206,7 @@ export default function RevenueChart() {
 
           return (
             <rect
+              className="chart-hit"
               key={item.month}
               x={x}
               y={PLOT.top}
@@ -220,7 +225,6 @@ export default function RevenueChart() {
                   setPersistentIndex(index);
                 }
               }}
-              style={{ cursor: 'pointer', outline: 'none' }}
             />
           );
         })}
