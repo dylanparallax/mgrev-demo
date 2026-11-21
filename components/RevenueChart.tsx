@@ -34,17 +34,20 @@ const Y_AXIS_VALUES = [0, 200, 400, 600, 800];
 const COLUMN_WIDTH = (PLOT.right - PLOT.left) / (REVENUE_DATA.length - 1);
 
 export default function RevenueChart() {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const selected = selectedIndex === null ? null : REVENUE_DATA[selectedIndex];
-  const selectedX = selectedIndex === null ? null : xFor(selectedIndex);
+  const [persistentIndex, setPersistentIndex] = useState<number | null>(null);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const displayedIndex = hoverIndex ?? persistentIndex;
+  const selected = displayedIndex === null ? null : REVENUE_DATA[displayedIndex];
+  const selectedX = displayedIndex === null ? null : xFor(displayedIndex);
 
   return (
     <svg
       viewBox="0 0 820 270"
       style={{ width: '100%', height: 'auto', display: 'block' }}
-      role="img"
-      aria-labelledby="revenue-chart-title revenue-chart-description"
-      onMouseLeave={() => setSelectedIndex(null)}
+      role="group"
+      aria-labelledby="revenue-chart-title"
+      aria-describedby="revenue-chart-description"
+      onMouseLeave={() => setHoverIndex(null)}
     >
       <title id="revenue-chart-title">Cumulative cross-sell revenue versus investment model</title>
       <desc id="revenue-chart-description">
@@ -58,7 +61,7 @@ export default function RevenueChart() {
             key={value}
             x1={PLOT.left}
             y1={yFor(value)}
-            x2={PLOT.right}
+            x2="800"
             y2={yFor(value)}
           />
         ))}
@@ -208,13 +211,13 @@ export default function RevenueChart() {
               tabIndex={0}
               role="button"
               aria-label={`${item.month}: Actual $${item.actual}K, Model $${item.model}K, gap $${item.model - item.actual}K`}
-              onPointerEnter={() => setSelectedIndex(index)}
-              onFocus={() => setSelectedIndex(index)}
-              onClick={() => setSelectedIndex(index)}
+              onPointerEnter={() => setHoverIndex(index)}
+              onFocus={() => setPersistentIndex(index)}
+              onClick={() => setPersistentIndex(index)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault();
-                  setSelectedIndex(index);
+                  setPersistentIndex(index);
                 }
               }}
               style={{ cursor: 'pointer', outline: 'none' }}
