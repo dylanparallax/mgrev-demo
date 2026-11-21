@@ -120,6 +120,11 @@ h2 { margin: 0; font-size: 18px; font-weight: 600; }
 .panel { background: var(--white); border: 1px solid var(--line); padding: 28px; display: flex; flex-direction: column; gap: 16px; }
 .legend { display: flex; gap: 20px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
 .legend span { display: flex; align-items: center; gap: 8px; }
+.revenue-chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart-hit { cursor: crosshair; outline: none; }
+.chart-hit:focus-visible { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; }
+.chart-guide { pointer-events: none; }
+.chart-tooltip { pointer-events: none; filter: drop-shadow(0 4px 10px rgb(26 28 32 / 16%)); }
 table.pairs { width: 100%; min-width: 720px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .pairs th { padding: 10px 0; font-weight: 500; font-size: 12px; color: var(--muted); text-align: right; border-bottom: 1px solid var(--ink); }
 .pairs th:first-child, .pairs td:first-child { text-align: left; }
