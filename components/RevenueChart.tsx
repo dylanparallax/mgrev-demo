@@ -32,6 +32,9 @@ const pointsFor = (key: 'actual' | 'model') =>
 
 const Y_AXIS_VALUES = [0, 200, 400, 600, 800];
 const COLUMN_WIDTH = (PLOT.right - PLOT.left) / (REVENUE_DATA.length - 1);
+const TOOLTIP_WIDTH = 200;
+const TOOLTIP_GAP = 12;
+const SVG_WIDTH = 820;
 
 export default function RevenueChart() {
   const [persistentIndex, setPersistentIndex] = useState<number | null>(null);
@@ -54,11 +57,11 @@ export default function RevenueChart() {
         aria-describedby="revenue-chart-description"
       >
         <title id="revenue-chart-title">
-          Cumulative cross-sell revenue versus investment model
+          Cumulative cross-sell revenue versus Year 1 ramp target
         </title>
         <desc id="revenue-chart-description">
           Cumulative cross-sell revenue from January to October 2026. Actual revenue reaches $612K
-          against a modeled $780K. Focus or select a month for details.
+          against a Year 1 ramp target of $780K. Focus or select a month for details.
         </desc>
 
         <g stroke="#ECECE8" strokeWidth="1">
@@ -167,9 +170,13 @@ export default function RevenueChart() {
 
             <g
               className="chart-tooltip"
-              transform={`translate(${selectedX > 600 ? selectedX - 176 : selectedX + 12}, 28)`}
+              transform={`translate(${
+                selectedX + TOOLTIP_GAP + TOOLTIP_WIDTH > SVG_WIDTH
+                  ? selectedX - TOOLTIP_WIDTH - TOOLTIP_GAP
+                  : selectedX + TOOLTIP_GAP
+              }, 28)`}
             >
-              <rect width="164" height="102" rx="5" fill="#24262B" />
+              <rect width={TOOLTIP_WIDTH} height="102" rx="5" fill="#24262B" />
               <text
                 x="12"
                 y="20"
@@ -206,7 +213,7 @@ export default function RevenueChart() {
                 fontFamily="Space Mono, monospace"
                 fontSize="11"
               >
-                Model ${selected.model}K
+                Year 1 ramp target ${selected.model}K
               </text>
               <text
                 x="12"
@@ -240,7 +247,7 @@ export default function RevenueChart() {
               fill="transparent"
               tabIndex={0}
               role="button"
-              aria-label={`${item.month}: Actual $${item.actual}K, Model $${item.model}K, gap $${item.model - item.actual}K`}
+              aria-label={`${item.month}: Actual $${item.actual}K, Year 1 ramp target $${item.model}K, gap $${item.model - item.actual}K`}
               onPointerEnter={() => setHoverIndex(index)}
               onPointerMove={() => setHoverIndex(index)}
               onFocus={() => {

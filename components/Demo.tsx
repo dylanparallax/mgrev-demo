@@ -14,6 +14,7 @@ import {
   type CompanyId,
   type Pair,
 } from '@/lib/data';
+import RevenueChart from './RevenueChart';
 import { useCountUp } from './useCountUp';
 
 type Phase = 'build' | 'write' | 'deliver' | 'inbox' | 'open' | 'sent' | 'pass';
@@ -59,7 +60,6 @@ function inputsFor(a: Account) {
 }
 
 export default function Demo() {
-  const [tab, setTab] = useState<'overview' | 'thesis'>('overview');
   const [active, setActive] = useState<Account | null>(null);
   const [phase, setPhase] = useState<Phase>('build');
   const [inputsOn, setInputsOn] = useState(0);
@@ -238,34 +238,24 @@ export default function Demo() {
               </span>
               <span className="client">Northfield Services Group</span>
             </div>
-            <nav className="tabs" role="tablist" aria-label="Views">
-              <button className="tab" role="tab" aria-selected={tab === 'overview'} onClick={() => setTab('overview')}>
-                Overview
-              </button>
-              <button className="tab" role="tab" aria-selected={tab === 'thesis'} onClick={() => setTab('thesis')}>
-                Thesis
-              </button>
-            </nav>
           </div>
         </header>
 
-        {tab === 'overview' ? (
-          <Overview
-            accounts={seedAccounts}
-            statuses={statuses}
-            active={active}
-            ready={ready}
-            intros={intros}
-            pipelineK={pipelineK}
-            bump={bump}
-            flashCell={flashCell}
-            feed={feed}
-            onPlay={startPlay}
-            onReset={reset}
-          />
-        ) : (
-          <Thesis intros={intros} pipelineK={pipelineK} bump={bump} pairs={pairs} changedPair={changedPair} />
-        )}
+        <Dashboard
+          accounts={seedAccounts}
+          statuses={statuses}
+          active={active}
+          ready={ready}
+          intros={intros}
+          pipelineK={pipelineK}
+          bump={bump}
+          flashCell={flashCell}
+          feed={feed}
+          pairs={pairs}
+          changedPair={changedPair}
+          onPlay={startPlay}
+          onReset={reset}
+        />
       </div>
 
       <aside className="drawer" aria-hidden={!active}>
@@ -305,7 +295,7 @@ export default function Demo() {
 
 /* ------------------------------------------------------------------ */
 
-function Overview(props: {
+function Dashboard(props: {
   accounts: Account[];
   statuses: Record<string, Status>;
   active: Account | null;
@@ -315,56 +305,108 @@ function Overview(props: {
   bump: number;
   flashCell: { key: string; n: number } | null;
   feed: FeedItem[];
+  pairs: Pair[];
+  changedPair: string | null;
   onPlay: (a: Account) => void;
   onReset: () => void;
 }) {
-  const { accounts, statuses, active, ready, intros, pipelineK, bump, flashCell, feed, onPlay, onReset } = props;
+  const {
+    accounts,
+    statuses,
+    active,
+    ready,
+    intros,
+    pipelineK,
+    bump,
+    flashCell,
+    feed,
+    pairs,
+    changedPair,
+    onPlay,
+    onReset,
+  } = props;
   const introsShown = useCountUp(intros);
   const pipeShown = useCountUp(pipelineK);
+  const pairRows = pairs.map((p) => {
+    const key = `${p.from}-${p.to}`;
+    return (
+      <tr key={key} className={p.stalled ? 'stalled' : ''}>
+        <td>
+          {pairName(p.from, p.to)}
+          {p.stalled && (
+            <span className="mono" style={{ fontSize: 11, marginLeft: 8 }}>
+              Stalled
+            </span>
+          )}
+        </td>
+        <td
+          key={changedPair === key ? `c${intros}` : 'n'}
+          className={changedPair === key ? 'changed' : ''}
+        >
+          {p.intros}
+        </td>
+        <td>{p.meetings}</td>
+        <td>{p.quotes}</td>
+        <td>${p.closed}K</td>
+        <td className={p.vsModel > 0 ? 'up' : ''}>
+          {p.vsModel === 0
+            ? 'New'
+            : `${p.vsModel > 0 ? '+' : '−'}${Math.abs(p.vsModel)}%`}
+        </td>
+      </tr>
+    );
+  });
 
   return (
     <main className="main">
-      <section className="hero">
-        <span className="label">Cross-sell opportunity in your current customers</span>
-        <div className="hero-num">
-          <strong className="num">${baseline.whitespace}M</strong>
-          <span>/ year</span>
-        </div>
-        <p>
-          Across <strong>318 existing customers</strong> who buy from one Northfield company and fit what another one sells.
-        </p>
+      <section className="dashboard-summary" aria-label="Cross-sell summary">
+        <section className="hero dashboard-panel">
+          <span className="label">Cross-sell opportunity in your current customers</span>
+          <h1 className="hero-num">
+            <strong className="num">${baseline.whitespace}M</strong>
+            <span>/ year</span>
+          </h1>
+          <p>
+            Across <strong>318 existing customers</strong> who buy from one Northfield company and fit what another one sells.
+          </p>
+        </section>
+
+        <section className="kpis">
+          <div key={`i${bump}`} className={`kpi${bump ? ' bump' : ''}`}>
+            <span className="k">Introductions sent</span>
+            <span className="v">{Math.round(introsShown)}</span>
+            <span className="s">{baseline.meetings} became meetings</span>
+          </div>
+          <div key={`p${bump}`} className={`kpi${bump ? ' bump' : ''}`}>
+            <span className="k">Open cross-sell pipeline</span>
+            <span className="v money">{fmtM(pipeShown)}</span>
+            <span className="s">Source: CRM opportunities</span>
+          </div>
+          <div className="kpi">
+            <span className="k">Cross-sell revenue YTD</span>
+            <span className="v money">${baseline.revenueYtd}K</span>
+            <span className="s">Year 1 ramp target ${baseline.model}K</span>
+          </div>
+          <div className="kpi">
+            <span className="k">Customers resolved</span>
+            <span className="v">{baseline.customersResolved.toLocaleString()}</span>
+            <span className="s">From 1,942 records in 4 CRMs</span>
+          </div>
+        </section>
       </section>
 
-      <section className="kpis">
-        <div key={`i${bump}`} className={`kpi${bump ? ' bump' : ''}`}>
-          <span className="k">Introductions sent</span>
-          <span className="v">{Math.round(introsShown)}</span>
-          <span className="s">{baseline.meetings} became meetings</span>
-        </div>
-        <div key={`p${bump}`} className={`kpi${bump ? ' bump' : ''}`}>
-          <span className="k">Open cross-sell pipeline</span>
-          <span className="v money">{fmtM(pipeShown)}</span>
-          <span className="s">Source: CRM opportunities</span>
-        </div>
-        <div className="kpi">
-          <span className="k">Cross-sell revenue YTD</span>
-          <span className="v money">${baseline.revenueYtd}K</span>
-          <span className="s">Model ${baseline.model}K</span>
-        </div>
-        <div className="kpi">
-          <span className="k">Customers resolved</span>
-          <span className="v">{baseline.customersResolved.toLocaleString()}</span>
-          <span className="s">From 1,942 records in 4 CRMs</span>
-        </div>
-      </section>
-
-      <section className="cols">
-        <div className="col">
+      <section className="dashboard-grid dashboard-grid-main" aria-label="Cross-sell actions">
+        <section className="dashboard-panel dashboard-matrix">
           <div className="col-head">
             <h2>Opportunity by company pair</h2>
             <span className="label">$K / yr, row sells to column</span>
           </div>
-          <div className="matrix-wrap">
+          <div
+            className="matrix-wrap"
+            tabIndex={0}
+            role="region"
+            aria-label="Opportunity by company pair matrix"
+          >
             <div className="matrix">
               <div className="mh first">Customer of ↓</div>
               {companyOrder.map((c) => (
@@ -377,9 +419,9 @@ function Overview(props: {
               ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="col">
+        <section className="dashboard-panel dashboard-plays">
           <div className="col-head">
             <h2>This week&apos;s plays</h2>
             <span className="label">{ready} ready</span>
@@ -410,29 +452,80 @@ function Overview(props: {
               );
             })}
           </div>
-        </div>
+        </section>
+
+        <section className="dashboard-panel dashboard-activity">
+          <div className="col-head">
+            <h2>Activity</h2>
+            <button className="btn quiet" onClick={onReset}>
+              Reset demo
+            </button>
+          </div>
+          <div className="feed">
+            {feed.slice(0, 6).map((f) => (
+              <div key={f.id} className="feed-item">
+                <time>{f.time}</time>
+                <span>{f.text}</span>
+              </div>
+            ))}
+          </div>
+        </section>
       </section>
 
-      <section className="col" style={{ flex: 'none' }}>
-        <div className="col-head">
-          <h2>Activity</h2>
-          <button className="btn quiet" onClick={onReset}>
-            Reset demo
-          </button>
-        </div>
-        <div className="feed">
-          {feed.slice(0, 6).map((f) => (
-            <div key={f.id} className="feed-item">
-              <time>{f.time}</time>
-              <span>{f.text}</span>
+      <section className="performance-heading">
+        <span className="label">Cross-sell performance</span>
+        <h2>78% of Year 1 ramp target</h2>
+      </section>
+
+      <section
+        className="dashboard-grid dashboard-grid-performance"
+        aria-label="Cross-sell performance"
+      >
+        <section className="panel dashboard-chart">
+          <div className="col-head">
+            <h2>Cumulative cross-sell revenue vs. Year 1 ramp target</h2>
+            <div className="legend">
+              <span>
+                <i className="legend-line actual" />
+                Actual
+              </span>
+              <span>
+                <i className="legend-line target" />
+                Year 1 ramp target
+              </span>
             </div>
-          ))}
-        </div>
+          </div>
+          <RevenueChart />
+        </section>
+        <section className="dashboard-panel dashboard-results">
+          <div className="col-head">
+            <h2>By company pair</h2>
+          </div>
+          <div
+            className="table-wrap"
+            tabIndex={0}
+            role="region"
+            aria-label="Cross-sell performance by company pair table"
+          >
+            <table className="pairs">
+              <thead>
+                <tr>
+                  <th>Pair</th>
+                  <th>Intros</th>
+                  <th>Meetings</th>
+                  <th>Quotes</th>
+                  <th>Closed YTD</th>
+                  <th>vs. target</th>
+                </tr>
+              </thead>
+              <tbody>{pairRows}</tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </main>
   );
 }
-
 function Row({ row, active, flashCell }: { row: CompanyId; active: Account | null; flashCell: { key: string; n: number } | null }) {
   return (
     <>
@@ -659,138 +752,5 @@ function InboxPanel({
        
       </article>
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-
-function Thesis({ intros, pipelineK, bump, pairs, changedPair }: { intros: number; pipelineK: number; bump: number; pairs: Pair[]; changedPair: string | null }) {
-  const introsShown = useCountUp(intros);
-  const pipeShown = useCountUp(pipelineK);
-  return (
-    <main className="main">
-      <section className="col-head" style={{ alignItems: 'flex-end' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <span className="label">Cross-sell thesis, year 1</span>
-          <h1 style={{ margin: 0, fontSize: 36, fontWeight: 500, letterSpacing: '-0.02em' }}>78% of model, closing the gap since May</h1>
-        </div>
-      </section>
-
-      <section className="kpis">
-        <div className="kpi">
-          <span className="k">Cross-sell revenue YTD</span>
-          <span className="v money">${baseline.revenueYtd}K</span>
-          <span className="s">Model ${baseline.model}K</span>
-        </div>
-        <div key={`p${bump}`} className={`kpi${bump ? ' bump' : ''}`}>
-          <span className="k">Open cross-sell pipeline</span>
-          <span className="v money">{fmtM(pipeShown)}</span>
-          <span className="s">+$340K vs. Sept</span>
-        </div>
-        <div key={`i${bump}`} className={`kpi${bump ? ' bump' : ''}`}>
-          <span className="k">Introductions sent</span>
-          <span className="v">{Math.round(introsShown)}</span>
-          <span className="s">{baseline.meetings} became meetings</span>
-        </div>
-        <div className="kpi">
-          <span className="k">New customers via cross-sell</span>
-          <span className="v">23</span>
-          <span className="s">Customer of A, now buying from B</span>
-        </div>
-      </section>
-
-      <section className="panel">
-        <div className="col-head">
-          <h2>Cumulative cross-sell revenue vs. investment model</h2>
-          <div className="legend">
-            <span>
-              <i style={{ width: 18, height: 2, background: '#F26322', display: 'inline-block' }} />
-              Actual
-            </span>
-            <span>
-              <i style={{ width: 18, borderTop: '2px dashed #8A8F99', display: 'inline-block' }} />
-              Model
-            </span>
-          </div>
-        </div>
-        <svg viewBox="0 0 820 270" style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label="Cumulative cross-sell revenue from January to October 2026: actual reaches $612K against a modeled $780K.">
-          <g stroke="#ECECE8" strokeWidth="1">
-            {[230, 177.5, 125, 72.5, 20].map((y) => (
-              <line key={y} x1="60" y1={y} x2="800" y2={y} />
-            ))}
-          </g>
-          <g fontFamily="Space Mono, monospace" fontSize="11" fill="#6E727C" textAnchor="end">
-            {['$0', '$200K', '$400K', '$600K', '$800K'].map((t, i) => (
-              <text key={t} x="48" y={234 - i * 52.5}>
-                {t}
-              </text>
-            ))}
-          </g>
-          <g fontFamily="Space Mono, monospace" fontSize="11" fill="#6E727C" textAnchor="middle">
-            {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT'].map((m, i) => (
-              <text key={m} x={60 + i * 80} y="254">
-                {m}
-              </text>
-            ))}
-          </g>
-          <polyline fill="none" stroke="#8A8F99" strokeWidth="2" strokeDasharray="6 5" points="60,222.1 140,211.6 220,198.5 300,182.75 380,164.4 460,143.4 540,119.75 620,93.5 700,62 780,25.25" />
-          <polyline fill="none" stroke="#F26322" strokeWidth="2.5" points="60,230 140,227.4 220,220.8 300,209 380,193.25 460,173.6 540,151.25 620,127.6 700,98.75 780,69.35" />
-          <circle cx="780" cy="69.35" r="4.5" fill="#F26322" />
-          <circle cx="780" cy="25.25" r="3.5" fill="#FFFFFF" stroke="#8A8F99" strokeWidth="2" />
-          <g fontFamily="Space Mono, monospace" fontSize="11" textAnchor="end">
-            <text x="770" y="88" fill="#B3440F">
-              $612K
-            </text>
-            <text x="770" y="16" fill="#6E727C">
-              $780K
-            </text>
-          </g>
-        </svg>
-      </section>
-
-      <section className="col" style={{ flex: 'none' }}>
-        <div className="col-head">
-          <h2>By company pair</h2>
-        </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table className="pairs">
-            <thead>
-              <tr>
-                <th>Pair</th>
-                <th>Intros</th>
-                <th>Meetings</th>
-                <th>Quotes</th>
-                <th>Closed YTD</th>
-                <th>vs. model</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pairs.map((p) => {
-                const key = `${p.from}-${p.to}`;
-                return (
-                  <tr key={key} className={p.stalled ? 'stalled' : ''}>
-                    <td>
-                      {pairName(p.from, p.to)}
-                      {p.stalled && (
-                        <span className="mono" style={{ fontSize: 11, marginLeft: 8 }}>
-                          Stalled
-                        </span>
-                      )}
-                    </td>
-                    <td key={changedPair === key ? `c${intros}` : 'n'} className={changedPair === key ? 'changed' : ''}>
-                      {p.intros}
-                    </td>
-                    <td>{p.meetings}</td>
-                    <td>{p.quotes}</td>
-                    <td>${p.closed}K</td>
-                    <td className={p.vsModel > 0 ? 'up' : ''}>{p.vsModel === 0 ? 'New' : `${p.vsModel > 0 ? '+' : '−'}${Math.abs(p.vsModel)}%`}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </main>
   );
 }
