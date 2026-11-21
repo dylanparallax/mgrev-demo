@@ -206,7 +206,7 @@ export default function RevenueChart() {
                 fontFamily="Space Mono, monospace"
                 fontSize="11"
               >
-                Model ${selected.model}K
+                Year 1 ramp target ${selected.model}K
               </text>
               <text
                 x="12"
