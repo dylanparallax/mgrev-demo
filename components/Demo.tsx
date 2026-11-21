@@ -14,7 +14,6 @@ import {
   type CompanyId,
   type Pair,
 } from '@/lib/data';
-import RevenueChart from './RevenueChart';
 import { useCountUp } from './useCountUp';
 
 type Phase = 'build' | 'write' | 'deliver' | 'inbox' | 'open' | 'sent' | 'pass';
@@ -675,7 +674,6 @@ function Thesis({ intros, pipelineK, bump, pairs, changedPair }: { intros: numbe
           <span className="label">Cross-sell thesis, year 1</span>
           <h1 style={{ margin: 0, fontSize: 36, fontWeight: 500, letterSpacing: '-0.02em' }}>78% of model, closing the gap since May</h1>
         </div>
-        <span className="label">Source: billing exports, updated Nov 1</span>
       </section>
 
       <section className="kpis">
@@ -715,13 +713,44 @@ function Thesis({ intros, pipelineK, bump, pairs, changedPair }: { intros: numbe
             </span>
           </div>
         </div>
-        <RevenueChart />
+        <svg viewBox="0 0 820 270" style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label="Cumulative cross-sell revenue from January to October 2026: actual reaches $612K against a modeled $780K.">
+          <g stroke="#ECECE8" strokeWidth="1">
+            {[230, 177.5, 125, 72.5, 20].map((y) => (
+              <line key={y} x1="60" y1={y} x2="800" y2={y} />
+            ))}
+          </g>
+          <g fontFamily="Space Mono, monospace" fontSize="11" fill="#6E727C" textAnchor="end">
+            {['$0', '$200K', '$400K', '$600K', '$800K'].map((t, i) => (
+              <text key={t} x="48" y={234 - i * 52.5}>
+                {t}
+              </text>
+            ))}
+          </g>
+          <g fontFamily="Space Mono, monospace" fontSize="11" fill="#6E727C" textAnchor="middle">
+            {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT'].map((m, i) => (
+              <text key={m} x={60 + i * 80} y="254">
+                {m}
+              </text>
+            ))}
+          </g>
+          <polyline fill="none" stroke="#8A8F99" strokeWidth="2" strokeDasharray="6 5" points="60,222.1 140,211.6 220,198.5 300,182.75 380,164.4 460,143.4 540,119.75 620,93.5 700,62 780,25.25" />
+          <polyline fill="none" stroke="#F26322" strokeWidth="2.5" points="60,230 140,227.4 220,220.8 300,209 380,193.25 460,173.6 540,151.25 620,127.6 700,98.75 780,69.35" />
+          <circle cx="780" cy="69.35" r="4.5" fill="#F26322" />
+          <circle cx="780" cy="25.25" r="3.5" fill="#FFFFFF" stroke="#8A8F99" strokeWidth="2" />
+          <g fontFamily="Space Mono, monospace" fontSize="11" textAnchor="end">
+            <text x="770" y="88" fill="#B3440F">
+              $612K
+            </text>
+            <text x="770" y="16" fill="#6E727C">
+              $780K
+            </text>
+          </g>
+        </svg>
       </section>
 
       <section className="col" style={{ flex: 'none' }}>
         <div className="col-head">
           <h2>By company pair</h2>
-          <span className="label">Originating rep credited on every close</span>
         </div>
         <div style={{ overflowX: 'auto' }}>
           <table className="pairs">
