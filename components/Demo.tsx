@@ -53,8 +53,8 @@ function inputsFor(a: Account) {
     { src: 'Buyer', what: `${a.buyer.name}, ${a.buyer.role}. Measured on: ${a.buyer.cares}` },
     { src: 'Signal', what: a.signal },
     { src: 'Northfield base', what: a.lookalikes },
-    { src: 'Brand voice · Monogram', what: `"${brandVoice.promise}" ${brandVoice.voice.join(', ')}.` },
-    { src: 'Playbook rule · Monogram', what: a.playRule, rule: true },
+    { src: 'Brand voice, Monogram', what: `"${brandVoice.promise}" ${brandVoice.voice.join(', ')}.` },
+    { src: 'Playbook rule, Monogram', what: a.playRule, rule: true },
   ];
 }
 
@@ -75,9 +75,9 @@ export default function Demo() {
   const [bump, setBump] = useState(0);
   const [flashCell, setFlashCell] = useState<{ key: string; n: number } | null>(null);
   const [feed, setFeed] = useState<FeedItem[]>([
-    { id: 3, time: 'Fri', text: <>Brookside Medical Plaza: meeting booked · <span className="row-sub">Keystone → Cardinal</span></> },
-    { id: 2, time: 'Thu', text: <>Granite Logistics: quote sent, <span className="money mono">$48K</span> · <span className="row-sub">Ridgeline → Keystone</span></> },
-    { id: 1, time: 'Thu', text: <>Oak Hollow ISD: intro sent by Alicia · <span className="row-sub">Summit → Keystone</span></> },
+    { id: 3, time: 'Fri', text: <>Brookside Medical Plaza: meeting booked, <span className="row-sub">Keystone → Cardinal</span></> },
+    { id: 2, time: 'Thu', text: <>Granite Logistics: quote sent, <span className="money mono">$48K</span>, <span className="row-sub">Ridgeline → Keystone</span></> },
+    { id: 1, time: 'Thu', text: <>Oak Hollow ISD: intro sent by Alicia, <span className="row-sub">Summit → Keystone</span></> },
   ]);
 
   const run = useRef(0);
@@ -192,7 +192,7 @@ export default function Demo() {
           time: clock(),
           text: (
             <>
-              {rep.first} sent intro to {a.buyer.name} at {a.name}, <span className="money mono">+${a.value}K</span> pipeline ·{' '}
+              {rep.first} sent intro to {a.buyer.name} at {a.name}, <span className="money mono">+${a.value}K</span> pipeline,{' '}
               <span className="row-sub">{pairName(a.from, a.to)}</span>
             </>
           ),
@@ -206,7 +206,7 @@ export default function Demo() {
           time: clock(),
           text: (
             <>
-              {rep.first} marked {a.name} not a fit · <span className="row-sub">fed back to the model</span>
+              {rep.first} marked {a.name} not a fit, <span className="row-sub">fed back to the model</span>
             </>
           ),
         },
@@ -236,7 +236,7 @@ export default function Demo() {
               <span className="wordmark">
                 mg<span>REV</span>
               </span>
-              <span className="client">Northfield Services Group · Sample platform</span>
+              <span className="client">Northfield Services Group</span>
             </div>
             <nav className="tabs" role="tablist" aria-label="Views">
               <button className="tab" role="tab" aria-selected={tab === 'overview'} onClick={() => setTab('overview')}>
@@ -333,7 +333,6 @@ function Overview(props: {
         <p>
           Across <strong>318 existing customers</strong> who buy from one Northfield company and fit what another one sells.
         </p>
-        <span className="source">Conservative estimate · scored against 46 customers who already buy from two or more companies</span>
       </section>
 
       <section className="kpis">
@@ -363,7 +362,7 @@ function Overview(props: {
         <div className="col">
           <div className="col-head">
             <h2>Opportunity by company pair</h2>
-            <span className="label">$K / yr · row sells to column</span>
+            <span className="label">$K / yr, row sells to column</span>
           </div>
           <div className="matrix-wrap">
             <div className="matrix">
@@ -393,7 +392,7 @@ function Overview(props: {
                   <div className="row-main">
                     <span className="row-name">{a.name}</span>
                     <span className="row-sub">
-                      {companies[a.from].name} customer · fits {companies[a.to].name}
+                      {companies[a.from].name} customer, fits {companies[a.to].name}
                     </span>
                   </div>
                   {st === 'sent' ? (
@@ -444,7 +443,7 @@ function Row({ row, active, flashCell }: { row: CompanyId; active: Account | nul
         if (col === row)
           return (
             <div key={col} className="mc self" aria-label="Same company">
-              ·
+              —
             </div>
           );
         const v = matrix[row][col] ?? 0;
@@ -474,7 +473,7 @@ function BuildPanel({ a, phase, inputsOn, draft, source }: { a: Account; phase: 
     <div className="build">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <span className="label">
-          {pairName(a.from, a.to)} · <span className="money">${a.value}K / yr</span>
+          {pairName(a.from, a.to)}, <span className="money">${a.value}K / yr</span>
         </span>
         <h3>{a.name}</h3>
       </div>
@@ -497,7 +496,7 @@ function BuildPanel({ a, phase, inputsOn, draft, source }: { a: Account; phase: 
             <span className="label">
               Introduction from {rep.first} to {a.buyer.first}
             </span>
-            <span className="label">{writing ? 'Writing' : 'Done'}{source === 'staged' ? ' · staged' : ''}</span>
+            <span className="label">{writing ? 'Writing' : 'Done'}{source === 'staged' ? ', staged' : ''}</span>
           </div>
           <div className={`draft${phase === 'deliver' ? ' flying' : ''}`}>
             {subject && <span className="subj">{subject}</span>}
@@ -537,7 +536,7 @@ function InboxPanel({
     return (
       <div className="inbox">
         <div key={toast} className="toast" role="status">
-          <span className="label">New · mgREV</span>
+          <span className="label">New, mgREV</span>
           <span style={{ fontSize: 14 }}>{title}</span>
         </div>
         <div className="inbox-top">
@@ -546,7 +545,7 @@ function InboxPanel({
         </div>
         <button className="msg new" onClick={onOpen}>
           <span className="msg-line">
-            <b>mgREV · Northfield</b>
+            <b>mgREV, Northfield</b>
             <time>Just now</time>
           </span>
           <span className="subj">{title}</span>
@@ -570,7 +569,7 @@ function InboxPanel({
         </div>
         <div className="msg read">
           <span className="msg-line">
-            <b>mgREV · Northfield</b>
+            <b>mgREV, Northfield</b>
             <time>Nov 6</time>
           </span>
           <span className="subj">Brookside Medical Plaza: meeting booked</span>
@@ -590,7 +589,7 @@ function InboxPanel({
       </div>
       <article className="letter">
         <header style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <span className="label">Cross-sell opportunity · from mgREV</span>
+          <span className="label">Cross-sell opportunity, from mgREV</span>
           <h3>{title}</h3>
         </header>
 
@@ -622,7 +621,7 @@ function InboxPanel({
           <div className="col-head">
             <h2 style={{ fontSize: 15 }}>Your introduction</h2>
             <span className="label" style={{ fontSize: 11 }}>
-              In Northfield voice · edit freely
+              In Northfield voice, edit freely
             </span>
           </div>
           <div className="draft" contentEditable={phase === 'open'} suppressContentEditableWarning aria-label="Introduction email draft">
@@ -644,7 +643,7 @@ function InboxPanel({
         )}
         {phase === 'sent' && (
           <div className="done-banner" role="status">
-            <span className="label">Intro sent · {clock()}</span>
+            <span className="label">Intro sent, {clock()}</span>
             <span>
               To {a.buyer.name}, cc {a.specialist.name}. Logged to the CRM, <span style={{ color: '#FBCFB5' }}>+${a.value}K</span> in pipeline.
             </span>
@@ -652,20 +651,12 @@ function InboxPanel({
         )}
         {phase === 'pass' && (
           <div className="done-banner" role="status">
-            <span className="label">Logged · {clock()}</span>
+            <span className="label">Logged, {clock()}</span>
             <span>Thanks. This goes back into the model so the next play is sharper.</span>
           </div>
         )}
 
-        <footer className="credit">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#F26322" strokeWidth="1.6" aria-hidden="true" style={{ flex: 'none', marginTop: 2 }}>
-            <circle cx="8" cy="8" r="6.5" />
-            <path d="M5 8.2l2 2 4-4.4" />
-          </svg>
-          <span>
-            You stay the relationship owner. You&apos;re credited as originating rep on anything {to.name} closes at {a.name}.
-          </span>
-        </footer>
+       
       </article>
     </div>
   );
@@ -680,10 +671,10 @@ function Thesis({ intros, pipelineK, bump, pairs, changedPair }: { intros: numbe
     <main className="main">
       <section className="col-head" style={{ alignItems: 'flex-end' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <span className="label">Cross-sell thesis · year 1</span>
+          <span className="label">Cross-sell thesis, year 1</span>
           <h1 style={{ margin: 0, fontSize: 36, fontWeight: 500, letterSpacing: '-0.02em' }}>78% of model, closing the gap since May</h1>
         </div>
-        <span className="label">Source: billing exports · updated Nov 1</span>
+        <span className="label">Source: billing exports, updated Nov 1</span>
       </section>
 
       <section className="kpis">

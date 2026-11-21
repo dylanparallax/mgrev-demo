@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'mgREV · Northfield Services Group',
+  title: 'mgREV, Northfield Services Group',
   description: 'Cross-sell demo: from whitespace to a rep-ready introduction.',
 };
 
