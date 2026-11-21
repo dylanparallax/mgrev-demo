@@ -54,11 +54,11 @@ export default function RevenueChart() {
         aria-describedby="revenue-chart-description"
       >
         <title id="revenue-chart-title">
-          Cumulative cross-sell revenue versus investment model
+          Cumulative cross-sell revenue versus Year 1 ramp target
         </title>
         <desc id="revenue-chart-description">
           Cumulative cross-sell revenue from January to October 2026. Actual revenue reaches $612K
-          against a modeled $780K. Focus or select a month for details.
+          against a Year 1 ramp target of $780K. Focus or select a month for details.
         </desc>
 
         <g stroke="#ECECE8" strokeWidth="1">
@@ -240,7 +240,7 @@ export default function RevenueChart() {
               fill="transparent"
               tabIndex={0}
               role="button"
-              aria-label={`${item.month}: Actual $${item.actual}K, Model $${item.model}K, gap $${item.model - item.actual}K`}
+              aria-label={`${item.month}: Actual $${item.actual}K, Year 1 ramp target $${item.model}K, gap $${item.model - item.actual}K`}
               onPointerEnter={() => setHoverIndex(index)}
               onPointerMove={() => setHoverIndex(index)}
               onFocus={() => {
