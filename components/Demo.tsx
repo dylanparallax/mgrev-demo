@@ -362,10 +362,10 @@ function Dashboard(props: {
       <section className="dashboard-summary" aria-label="Cross-sell summary">
         <section className="hero dashboard-panel">
           <span className="label">Cross-sell opportunity in your current customers</span>
-          <div className="hero-num">
+          <h1 className="hero-num">
             <strong className="num">${baseline.whitespace}M</strong>
             <span>/ year</span>
-          </div>
+          </h1>
           <p>
             Across <strong>318 existing customers</strong> who buy from one Northfield company and fit what another one sells.
           </p>
@@ -401,7 +401,12 @@ function Dashboard(props: {
             <h2>Opportunity by company pair</h2>
             <span className="label">$K / yr, row sells to column</span>
           </div>
-          <div className="matrix-wrap">
+          <div
+            className="matrix-wrap"
+            tabIndex={0}
+            role="region"
+            aria-label="Opportunity by company pair matrix"
+          >
             <div className="matrix">
               <div className="mh first">Customer of ↓</div>
               {companyOrder.map((c) => (
@@ -496,7 +501,12 @@ function Dashboard(props: {
           <div className="col-head">
             <h2>By company pair</h2>
           </div>
-          <div className="table-wrap">
+          <div
+            className="table-wrap"
+            tabIndex={0}
+            role="region"
+            aria-label="Cross-sell performance by company pair table"
+          >
             <table className="pairs">
               <thead>
                 <tr>

@@ -63,7 +63,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ink); outline-o
 
 /* ---------- hero ---------- */
 .hero { display: flex; flex-direction: column; gap: 12px; }
-.hero-num { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.hero-num { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0; font-size: inherit; font-weight: inherit; }
 .hero-num strong { font-size: clamp(64px, 9vw, 120px); line-height: 1; font-weight: 500; letter-spacing: -0.04em; }
 .hero-num span { font-size: 28px; color: var(--muted); }
 .hero p { margin: 0; font-size: 21px; line-height: 1.4; max-width: 720px; }
@@ -141,6 +141,12 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ink); outline-o
 
 .table-wrap {
   overflow-x: auto;
+}
+
+.matrix-wrap:focus-visible,
+.table-wrap:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 /* ---------- KPI strip ---------- */
@@ -286,6 +292,26 @@ table.pairs { width: 100%; min-width: 720px; border-collapse: collapse; font-var
 .done-banner .label { color: #b8bbc2; }
 
 .empty-note { font-size: 13px; color: var(--muted); }
+
+@media (min-width: 1101px) {
+  .shell.open .dashboard-summary,
+  .shell.open .dashboard-grid-main,
+  .shell.open .dashboard-grid-performance {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shell.open .dashboard-activity {
+    grid-column: auto;
+  }
+
+  .shell.open .dashboard-plays .row {
+    flex-wrap: wrap;
+  }
+
+  .shell.open .dashboard-plays .row-main {
+    flex-basis: 100%;
+  }
+}
 
 @media (max-width: 1100px) {
   :root { --drawer: 100vw; }
