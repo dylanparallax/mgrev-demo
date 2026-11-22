@@ -432,7 +432,6 @@ function Dashboard(props: {
     <main className="main">
       <section className="dashboard-summary" aria-label="Cross-sell summary">
         <section className="hero">
-          <span className="label">Cross-sell opportunity in your current customers</span>
           <h1 className="hero-num">
             <strong className="num">${baseline.whitespace}M</strong>
             <span>/ year</span>
