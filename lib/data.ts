@@ -226,7 +226,7 @@ Mike`,
 
 export const baseline = {
   whitespace: 4.2, // $M
-  customersResolved: 1611,
+  fits: 318,
   intros: 214,
   meetings: 61,
   pipeline: 1.9, // $M

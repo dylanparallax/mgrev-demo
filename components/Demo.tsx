@@ -47,6 +47,71 @@ function splitDraft(text: string) {
   return { subject: m[1].trim(), body: text.slice(m[0].length).replace(/^\s+/, '') };
 }
 
+function OpportunityDonut({
+  fits,
+  intros,
+  meetings,
+  quotes,
+}: {
+  fits: number;
+  intros: number;
+  meetings: number;
+  quotes: number;
+}) {
+  const slices = [
+    { key: 'waiting', label: 'Not introduced', value: Math.max(0, fits - intros) },
+    { key: 'intro', label: 'Introduced, no meeting', value: Math.max(0, intros - meetings) },
+    { key: 'meeting', label: 'Met, no quote', value: Math.max(0, meetings - quotes) },
+    { key: 'quote', label: 'Quoted', value: Math.max(0, quotes) },
+  ];
+  const radius = 42;
+  const circumference = 2 * Math.PI * radius;
+  const gap = 3;
+  let cursor = 0;
+  const summary = slices
+    .map((slice) => `${Math.round(slice.value).toLocaleString()} ${slice.label}`)
+    .join(', ');
+
+  return (
+    <div className="donut-fig">
+      <svg className="donut" viewBox="0 0 120 120" role="img" aria-label={`Opportunity mix. ${summary}.`}>
+        {slices.map((slice) => {
+          const raw = (slice.value / fits) * circumference;
+          const length = Math.max(0, raw - gap);
+          const dashOffset = -cursor;
+          cursor += raw;
+          return (
+            <circle
+              key={slice.key}
+              className={slice.key}
+              cx="60"
+              cy="60"
+              r={radius}
+              fill="none"
+              strokeWidth="14"
+              strokeDasharray={`${length} ${circumference - length}`}
+              strokeDashoffset={dashOffset}
+              transform="rotate(-90 60 60)"
+            />
+          );
+        })}
+        <text className="donut-total" x="60" y="60" textAnchor="middle" dominantBaseline="central">
+          {fits.toLocaleString()}
+        </text>
+      </svg>
+      <ul className="donut-legend">
+        {slices.map((slice) => (
+          <li key={slice.key}>
+            <i className={`swatch ${slice.key}`} aria-hidden="true" />
+            <span className="num">{Math.round(slice.value).toLocaleString()}</span>
+            <span>{slice.label}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function inputsFor(a: Account) {
   const from = companies[a.from];
   return [
@@ -75,9 +140,12 @@ export default function Demo() {
   const [bump, setBump] = useState(0);
   const [flashCell, setFlashCell] = useState<{ key: string; n: number } | null>(null);
   const [feed, setFeed] = useState<FeedItem[]>([
-    { id: 3, time: 'Fri', text: <>Brookside Medical Plaza: meeting booked, <span className="row-sub">Keystone → Cardinal</span></> },
-    { id: 2, time: 'Thu', text: <>Granite Logistics: quote sent, <span className="money mono">$48K</span>, <span className="row-sub">Ridgeline → Keystone</span></> },
-    { id: 1, time: 'Thu', text: <>Oak Hollow ISD: intro sent by Alicia, <span className="row-sub">Summit → Keystone</span></> },
+    { id: 6, time: 'Fri', text: <>Brookside Medical Plaza: meeting booked, <span className="row-sub">Keystone → Cardinal</span></> },
+    { id: 5, time: 'Thu', text: <>Granite Logistics: quote sent, <span className="money mono">$48K</span>, <span className="row-sub">Ridgeline → Keystone</span></> },
+    { id: 4, time: 'Thu', text: <>Oak Hollow ISD: intro sent by Alicia, <span className="row-sub">Summit → Keystone</span></> },
+    { id: 3, time: 'Wed', text: <>Northline Cold Storage: intro sent by Sam, <span className="row-sub">Ridgeline → Keystone</span></> },
+    { id: 2, time: 'Wed', text: <>St. Brigid Clinic: meeting booked, <span className="row-sub">Keystone → Cardinal</span></> },
+    { id: 1, time: 'Tue', text: <>Fieldstone Mall: quote sent, <span className="money mono">$36K</span>, <span className="row-sub">Keystone → Ridgeline</span></> },
   ]);
 
   const run = useRef(0);
@@ -327,6 +395,9 @@ function Dashboard(props: {
   } = props;
   const introsShown = useCountUp(intros);
   const pipeShown = useCountUp(pipelineK);
+  const quotes = pairs.reduce((sum, pair) => sum + pair.quotes, 0);
+  const rampPct = Math.round((baseline.revenueYtd / baseline.model) * 100);
+  const introPct = Math.min(100, Math.round((introsShown / baseline.fits) * 100));
   const pairRows = pairs.map((p) => {
     const key = `${p.from}-${p.to}`;
     return (
@@ -360,37 +431,61 @@ function Dashboard(props: {
   return (
     <main className="main">
       <section className="dashboard-summary" aria-label="Cross-sell summary">
-        <section className="hero dashboard-panel">
+        <section className="hero">
           <span className="label">Cross-sell opportunity in your current customers</span>
           <h1 className="hero-num">
             <strong className="num">${baseline.whitespace}M</strong>
             <span>/ year</span>
           </h1>
           <p>
-            Across <strong>318 existing customers</strong> who buy from one Northfield company and fit what another one sells.
+            Across <strong>{baseline.fits.toLocaleString()} existing customers</strong> who buy from one Northfield company and fit what another one sells.
           </p>
         </section>
 
         <section className="kpis">
+          <div key={`d${bump}`} className={`kpi${bump ? ' bump' : ''}`}>
+            <span className="k">Opportunity mix</span>
+            <OpportunityDonut
+              fits={baseline.fits}
+              intros={introsShown}
+              meetings={baseline.meetings}
+              quotes={quotes}
+            />
+          </div>
           <div key={`i${bump}`} className={`kpi${bump ? ' bump' : ''}`}>
             <span className="k">Introductions sent</span>
-            <span className="v">{Math.round(introsShown)}</span>
-            <span className="s">{baseline.meetings} became meetings</span>
+            <span className="v money num">{Math.round(introsShown).toLocaleString()}</span>
+            <div
+              className="meter"
+              role="meter"
+              aria-valuemin={0}
+              aria-valuemax={baseline.fits}
+              aria-valuenow={Math.round(introsShown)}
+              aria-label={`${Math.round(introsShown).toLocaleString()} of ${baseline.fits.toLocaleString()} customer fits`}
+            >
+              <span style={{ width: `${introPct}%` }} />
+            </div>
+            <span className="s">{introPct}% of {baseline.fits.toLocaleString()} customer fits</span>
           </div>
           <div key={`p${bump}`} className={`kpi${bump ? ' bump' : ''}`}>
             <span className="k">Open cross-sell pipeline</span>
             <span className="v money">{fmtM(pipeShown)}</span>
-            <span className="s">Source: CRM opportunities</span>
+            <span className="s">CRM opportunities</span>
           </div>
           <div className="kpi">
             <span className="k">Cross-sell revenue YTD</span>
             <span className="v money">${baseline.revenueYtd}K</span>
-            <span className="s">Year 1 ramp target ${baseline.model}K</span>
-          </div>
-          <div className="kpi">
-            <span className="k">Customers resolved</span>
-            <span className="v">{baseline.customersResolved.toLocaleString()}</span>
-            <span className="s">From 1,942 records in 4 CRMs</span>
+            <div
+              className="meter"
+              role="meter"
+              aria-valuemin={0}
+              aria-valuemax={baseline.model}
+              aria-valuenow={baseline.revenueYtd}
+              aria-label={`$${baseline.revenueYtd}K of $${baseline.model}K Year 1 ramp target`}
+            >
+              <span style={{ width: `${rampPct}%` }} />
+            </div>
+            <span className="s">{rampPct}% of ${baseline.model}K Year 1 target</span>
           </div>
         </section>
       </section>
@@ -457,8 +552,16 @@ function Dashboard(props: {
         <section className="dashboard-panel dashboard-activity">
           <div className="col-head">
             <h2>Activity</h2>
-            <button className="btn quiet" onClick={onReset}>
-              Reset demo
+            <button className="icon-btn" onClick={onReset} aria-label="Reset demo" title="Reset demo">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <path d="M3 3v5h5" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
             </button>
           </div>
           <div className="feed">
@@ -473,8 +576,8 @@ function Dashboard(props: {
       </section>
 
       <section className="performance-heading">
-        <span className="label">Cross-sell performance</span>
-        <h2>78% of Year 1 ramp target</h2>
+        <h2>Cross-sell performance</h2>
+        <h2>{rampPct}% of Year 1 ramp target</h2>
       </section>
 
       <section
