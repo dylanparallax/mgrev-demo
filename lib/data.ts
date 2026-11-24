@@ -51,7 +51,7 @@ export type Account = {
   value: number; // $K / yr
   fit: 'HIGH' | 'MED';
   rep: keyof typeof reps;
-  buyer: { name: string; first: string; role: string; cares: string };
+  buyer: { name: string; first: string; role: string; phone: string; cares: string };
   specialist: { name: string; title: string };
   history: string;
   signal: string;
@@ -70,7 +70,7 @@ export const accounts: Account[] = [
     value: 86,
     fit: 'HIGH',
     rep: 'jordan',
-    buyer: { name: 'Marcus Hale', first: 'Marcus', role: 'Director of Facilities', cares: 'Passing the spring accreditation survey with no findings.' },
+    buyer: { name: 'Marcus Hale', first: 'Marcus', role: 'Director of Facilities', phone: '(410) 555-0142', cares: 'Passing the spring accreditation survey with no findings.' },
     specialist: { name: 'Dana Ruiz', title: 'Healthcare Fire & Life Safety Lead, Cardinal' },
     history: 'Keystone has serviced Harbor Point’s HVAC since 2021. 4 rooftop units, chiller PM, 11 emergency calls answered in under an hour.',
     signal: 'Current fire protection contract renews in Q1. Accreditation survey due in the spring.',
@@ -102,7 +102,7 @@ Jordan`,
     value: 74,
     fit: 'HIGH',
     rep: 'sam',
-    buyer: { name: 'Priya Nair', first: 'Priya', role: 'Operations Manager', cares: 'Throughput and keeping pick crews productive through summer.' },
+    buyer: { name: 'Priya Nair', first: 'Priya', role: 'Operations Manager', phone: '(443) 555-0176', cares: 'Throughput and keeping pick crews productive through summer.' },
     specialist: { name: 'Tom Becker', title: 'Industrial HVAC Manager, Keystone' },
     history: 'Ridgeline did the LED retrofit and dock electrical in 2023, plus ongoing service. Priya calls Sam directly.',
     signal: 'Rooftop units are 18 years old. Ridgeline techs noted heat complaints in the pick zones last July.',
@@ -134,7 +134,7 @@ Sam`,
     value: 68,
     fit: 'MED',
     rep: 'alicia',
-    buyer: { name: 'Ray Delgado', first: 'Ray', role: 'Director of Maintenance & Operations', cares: 'Getting bond-funded replacements done inside the summer window.' },
+    buyer: { name: 'Ray Delgado', first: 'Ray', role: 'Director of Maintenance & Operations', phone: '(410) 555-0190', cares: 'Getting bond-funded replacements done inside the summer window.' },
     specialist: { name: 'Tom Becker', title: 'HVAC Project Manager, Keystone' },
     history: 'Summit installed building automation at 9 Lakeview schools and monitors them remotely.',
     signal: 'The district passed a facilities bond. HVAC replacements at 4 schools go out to bid in the spring.',
@@ -166,7 +166,7 @@ Alicia`,
     value: 61,
     fit: 'HIGH',
     rep: 'jordan',
-    buyer: { name: 'Elena Brooks', first: 'Elena', role: 'Property Manager', cares: 'Tenant retention and renewals.' },
+    buyer: { name: 'Elena Brooks', first: 'Elena', role: 'Property Manager', phone: '(410) 555-0164', cares: 'Tenant retention and renewals.' },
     specialist: { name: 'Kevin Marsh', title: 'Commercial Projects Lead, Ridgeline' },
     history: 'Keystone has the HVAC maintenance contract for all 3 buildings since 2022.',
     signal: 'Two anchor tenants asked about EV charging ahead of lease renewals.',
@@ -198,7 +198,7 @@ Jordan`,
     value: 52,
     fit: 'MED',
     rep: 'mike',
-    buyer: { name: 'Gloria Tate', first: 'Gloria', role: 'Executive Director', cares: 'Resident comfort and family satisfaction scores.' },
+    buyer: { name: 'Gloria Tate', first: 'Gloria', role: 'Executive Director', phone: '(443) 555-0133', cares: 'Resident comfort and family satisfaction scores.' },
     specialist: { name: 'Tom Becker', title: 'HVAC Service Manager, Keystone' },
     history: 'Cardinal has done fire inspection and alarm testing at Pinecrest since 2019.',
     signal: 'Resident comfort complaints rose last summer. Families raised it in reviews.',
