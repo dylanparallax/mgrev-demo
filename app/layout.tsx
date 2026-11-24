@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'mgREV, Northfield Services Group',
-  description: 'Cross-sell demo: from whitespace to a rep-ready introduction.',
+  description: 'mgREV runs any sales motion for Northfield Services Group.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
