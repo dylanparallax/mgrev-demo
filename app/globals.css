@@ -646,6 +646,7 @@ table.battle { width: 100%; min-width: 560px; border-collapse: collapse; font-si
 
 @media (max-width: 800px) {
   .shell.open { grid-template-columns: minmax(0, 0fr) minmax(0, 1fr); }
+  .goal-meter { display: none; }
 }
 @media (max-width: 1240px) {
   .dashboard-summary {
