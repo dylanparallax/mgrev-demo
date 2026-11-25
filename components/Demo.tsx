@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import {
   accounts as seedAccounts,
   baseline,
   companies,
   companyOrder,
+  jordanQueue,
   matrix,
   pairs as seedPairs,
   type Account,
@@ -30,6 +31,9 @@ type PlayPhase = 'generating' | 'ready';
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const fmtM = (k: number) => `$${(k / 1000).toFixed(2)}M`;
 const pairName = (from: CompanyId, to: CompanyId) => `${companies[from].name} → ${companies[to].name}`;
+const openingPlay = seedAccounts.find((account) => account.id === 'harbor-point') ?? null;
+const formatWorked = (iso: string) =>
+  new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
 function heat(v: number) {
   if (v >= 500) return 'h3';
@@ -102,23 +106,16 @@ function OpportunityDonut({
 }
 
 export default function Demo() {
-  const [profile, setProfile] = useState<ProfileId>('vcl');
-  const [active, setActive] = useState<Account | null>(null);
+  const [profile, setProfile] = useState<ProfileId>('rep');
+  const [active, setActive] = useState<Account | null>(openingPlay);
   const [phase, setPhase] = useState<PlayPhase>('ready');
   const run = useRef(0);
 
-  const close = useCallback(() => {
+  function showPlay(account: Account) {
     run.current += 1;
-    setActive(null);
-  }, []);
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && active) close();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [active, close]);
+    setActive(account);
+    setPhase('ready');
+  }
 
   async function startPlay(account: Account) {
     const id = ++run.current;
@@ -130,29 +127,34 @@ export default function Demo() {
   }
 
   function switchProfile(next: ProfileId) {
-    close();
+    run.current += 1;
+    setPhase('ready');
     setProfile(next);
+    setActive(next === 'rep' ? openingPlay : null);
   }
+
+  const goalK = baseline.whitespace * 1000;
+  const progress = Math.min(100, Math.round((baseline.revenueYtd / goalK) * 100));
 
   return (
     <div className={`shell${active ? ' open' : ''}`}>
-      <div className="stage">
-        <header className="topbar">
-          <div className="topbar-inner">
-            <div className="brand">
-              <span className="wordmark">
-                mg<span>REV</span>
-              </span>
-              <span className="client">Northfield Services Group</span>
-            </div>
-            <ProfileSwitch profile={profile} onChange={switchProfile} />
+      <header className="topbar">
+        <div className="topbar-inner">
+          <div className="brand">
+            <span className="wordmark">
+              mg<span>REV</span>
+            </span>
+            <span className="client">Northfield Services Group</span>
           </div>
-        </header>
+          <ProfileSwitch profile={profile} onChange={switchProfile} />
+        </div>
+      </header>
 
+      <div className="stage">
         {profile === 'vcl' ? (
-          <Dashboard accounts={seedAccounts} active={active} onPlay={startPlay} />
+          <Dashboard accounts={seedAccounts} active={active} phase={phase} onPlay={startPlay} />
         ) : (
-          <RepPlays active={active} onPlay={startPlay} />
+          <RepPlays active={active} phase={phase} onPlay={startPlay} onSelect={showPlay} />
         )}
       </div>
 
@@ -164,9 +166,6 @@ export default function Demo() {
                 <span className="label">{accountMotionLine(active)}</span>
                 <h2 className="drawer-title">{active.name}</h2>
               </div>
-              <button type="button" className="close" onClick={close} aria-label="Close">
-                Close
-              </button>
             </div>
             <div className="drawer-body">
               <PlayPanel account={active} phase={phase} />
@@ -174,6 +173,24 @@ export default function Demo() {
           </div>
         )}
       </aside>
+      <div
+        className="goal-meter"
+        role="meter"
+        aria-valuemin={0}
+        aria-valuemax={goalK}
+        aria-valuenow={baseline.revenueYtd}
+        aria-label={`$${baseline.revenueYtd}K of $${baseline.whitespace}M`}
+        title={`$${baseline.revenueYtd}K of $${baseline.whitespace}M`}
+      >
+        <span className="goal-meter-goal" style={{ bottom: `${progress}%` }} aria-hidden="true">
+          ${baseline.whitespace}M
+        </span>
+        <span className="goal-meter-fill" style={{ height: `${progress}%` }}>
+          <span className="goal-meter-now" aria-hidden="true">
+            ${baseline.revenueYtd}K
+          </span>
+        </span>
+      </div>
     </div>
   );
 }
@@ -181,10 +198,12 @@ export default function Demo() {
 function Dashboard({
   accounts,
   active,
+  phase,
   onPlay,
 }: {
   accounts: Account[];
   active: Account | null;
+  phase: PlayPhase;
   onPlay: (account: Account) => void;
 }) {
   const [motion, setMotion] = useState<MotionId>('cross-sell');
@@ -207,7 +226,6 @@ function Dashboard({
         {motion === 'cross-sell' ? (
           <section className="kpis">
             <div className="kpi">
-              <span className="k">Opportunity mix</span>
               <OpportunityDonut fits={baseline.fits} intros={introsShown} meetings={baseline.meetings} quotes={quotes} />
             </div>
             <div className="kpi">
@@ -280,7 +298,7 @@ function Dashboard({
       </section>
 
       {motion === 'cross-sell' ? (
-        <CrossSellDetail accounts={accounts} active={active} onPlay={onPlay} rampPct={rampPct} pairs={seedPairs} />
+        <CrossSellDetail accounts={accounts} active={active} phase={phase} onPlay={onPlay} rampPct={rampPct} pairs={seedPairs} />
       ) : (
         <MotionPreview motion={selected} />
       )}
@@ -347,12 +365,14 @@ function MotionPreview({ motion }: { motion: Motion }) {
 function CrossSellDetail({
   accounts,
   active,
+  phase,
   onPlay,
   rampPct,
   pairs,
 }: {
   accounts: Account[];
   active: Account | null;
+  phase: PlayPhase;
   onPlay: (account: Account) => void;
   rampPct: number;
   pairs: Pair[];
@@ -391,7 +411,7 @@ function CrossSellDetail({
           </div>
           <div className="list">
             {accounts.map((account) => (
-              <PlayRow key={account.id} account={account} active={active} onPlay={onPlay} />
+              <PlayRow key={account.id} account={account} active={active} phase={phase} onPlay={onPlay} />
             ))}
           </div>
         </section>
@@ -497,13 +517,15 @@ function Feed() {
 function PlayRow({
   account,
   active,
+  phase,
   onPlay,
 }: {
   account: Account;
   active: Account | null;
+  phase: PlayPhase;
   onPlay: (account: Account) => void;
 }) {
-  const running = active?.id === account.id;
+  const running = active?.id === account.id && phase === 'generating';
   return (
     <div className="row">
       <div className="row-main">
@@ -513,65 +535,73 @@ function PlayRow({
       <span className={`chip ${account.fit === 'HIGH' ? 'high' : 'med'}`}>{account.fit === 'HIGH' ? 'High' : 'Med'}</span>
       <span className="row-val money">${account.value}K</span>
       <button type="button" className="btn" disabled={running} onClick={() => onPlay(account)}>
-        {running ? 'Running' : 'Run play'}
+        {running ? 'Running' : 'Work'}
       </button>
     </div>
   );
 }
 
-function RepPlays({ active, onPlay }: { active: Account | null; onPlay: (account: Account) => void }) {
-  const plays = seedAccounts
+function RepPlays({
+  active,
+  phase,
+  onPlay,
+  onSelect,
+}: {
+  active: Account | null;
+  phase: PlayPhase;
+  onPlay: (account: Account) => void;
+  onSelect: (account: Account) => void;
+}) {
+  const assigned = seedAccounts
     .filter((account) => account.rep === 'jordan')
-    .sort((a, b) => Number(b.id === 'harbor-point') - Number(a.id === 'harbor-point'));
+    .sort((a, b) => Number(b.id === 'harbor-point') - Number(a.id === 'harbor-point'))
+    .map((account) => ({ account, workedOn: undefined as string | undefined }));
+  const added = jordanQueue.map((play) => ({
+    account: play.account,
+    workedOn: play.workedOn,
+  }));
+  const plays = [...assigned, ...added.filter((play) => !play.workedOn), ...added.filter((play) => play.workedOn)];
 
   return (
-    <main className="main">
+    <main className="main rep-main">
       <section className="hero">
         <h1 className="page-title">Plays</h1>
       </section>
       <section className="dashboard-panel rep-plays" aria-label="Plays assigned to Jordan">
-        <div className="table-wrap">
-          <table className="rep-table">
-            <thead>
-              <tr>
-                <th scope="col">Account</th>
-                <th scope="col">Motion</th>
-                <th scope="col">Est. value</th>
-                <th scope="col">Fit</th>
-                <th scope="col">
-                  <span className="sr-only">Action</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {plays.map((account) => {
-                const running = active?.id === account.id;
-                return (
-                  <tr key={account.id}>
-                    <td>
-                      <div className="row-main">
-                        <span className="row-name">{account.name}</span>
-                        <span className="row-sub">{accountMotionLine(account)}</span>
-                      </div>
-                    </td>
-                    <td className="mono">Cross-sell</td>
-                    <td className="money mono">${account.value}K</td>
-                    <td>
-                      <span className={`chip ${account.fit === 'HIGH' ? 'high' : 'med'}`}>
-                        {account.fit === 'HIGH' ? 'High' : 'Med'}
-                      </span>
-                    </td>
-                    <td>
-                      <button type="button" className="btn" disabled={running} onClick={() => onPlay(account)}>
-                        {running ? 'Running' : 'Run play'}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <ul className="rep-list">
+          {plays.map(({ account, workedOn }) => {
+            const open = active?.id === account.id;
+            const running = open && phase === 'generating';
+            return (
+              <li
+                key={account.id}
+                className={`rep-play${workedOn ? ' worked' : ''}`}
+                aria-current={open ? 'true' : undefined}
+              >
+                <button type="button" className="rep-play-hit" aria-pressed={open} onClick={() => onSelect(account)}>
+                  <span className="row-name">{account.name}</span>
+                  <span className="row-sub">{accountMotionLine(account)}</span>
+                  <span className="rep-motion">Cross-sell</span>
+                  <span className="rep-meta">
+                    <span className="money mono">${account.value}K</span>
+                    <span className={`chip ${account.fit === 'HIGH' ? 'high' : 'med'}`}>
+                      {account.fit === 'HIGH' ? 'High' : 'Med'}
+                    </span>
+                  </span>
+                </button>
+                {workedOn ? (
+                  <span className="rep-worked">
+                    Worked <time dateTime={workedOn}>{formatWorked(workedOn)}</time>
+                  </span>
+                ) : (
+                  <button type="button" className="btn" disabled={running} onClick={() => onPlay(account)}>
+                    {running ? 'Running' : 'Work'}
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       </section>
     </main>
   );
