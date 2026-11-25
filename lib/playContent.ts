@@ -285,7 +285,7 @@ function fallbackPlay(account: Account): PlayContent {
       account: account.name,
       value: `$${account.value}K`,
       fit: account.fit === 'HIGH' ? 'High' : 'Med',
-      renewal: 'See signal',
+      renewal: account.renewal,
     },
     points: account.why.map((text) => ({ lead: '', text })),
     dealIncludes: account.playRule,
