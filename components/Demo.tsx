@@ -133,6 +133,12 @@ export default function Demo() {
     setActive(next === 'rep' ? openingPlay : null);
   }
 
+  function closePlay() {
+    run.current += 1;
+    setPhase('ready');
+    setActive(null);
+  }
+
   const goalK = baseline.whitespace * 1000;
   const progress = Math.min(100, Math.round((baseline.revenueYtd / goalK) * 100));
 
@@ -162,6 +168,18 @@ export default function Demo() {
         {active && (
           <div className="drawer-inner">
             <div className="drawer-head">
+              <button type="button" className="drawer-back" onClick={closePlay}>
+                {profile === 'rep' ? (
+                  <>
+                    <svg className="drawer-back-mark" viewBox="0 0 8 12" aria-hidden="true" focusable="false">
+                      <path d="M6.6 0 L1.4 6 L6.6 12 L5.2 12 L0 6 L5.2 0 Z" />
+                    </svg>
+                    All plays
+                  </>
+                ) : (
+                  'Dashboard'
+                )}
+              </button>
               <div>
                 <span className="label">{accountMotionLine(active)}</span>
                 <h2 className="drawer-title">{active.name}</h2>

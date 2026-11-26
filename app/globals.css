@@ -123,7 +123,14 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--ink); outline-o
 .hero-num span { font-size: 28px; color: var(--muted); }
 .hero p { margin: 0; font-size: 21px; line-height: 1.4; max-width: 720px; }
 .hero .source { font-family: var(--mono); text-transform: uppercase; font-size: 13px; color: var(--muted); line-height: 1.6; }
-.page-title { margin: 0; font-size: clamp(40px, 5vw, 64px); font-weight: 500; letter-spacing: -0.03em; }
+.page-title {
+  margin: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
 .motion-note { margin: 0; font-size: 16px; line-height: 1.45; max-width: 720px; }
 .motions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .motion {
@@ -398,6 +405,29 @@ table.pairs { width: 100%; min-width: 720px; border-collapse: collapse; font-var
 .shell:not(.open) .drawer { border-left: 0; }
 .drawer-inner { width: 100%; height: 100%; display: flex; flex-direction: column; }
 .drawer-head { padding: 16px 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.drawer-back {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: normal;
+}
+.drawer-back-mark {
+  display: block;
+  width: 0.7cap;
+  height: 1cap;
+  flex: none;
+  transform: translateY(-0.25px);
+}
 .drawer-title { margin: 4px 0 0; font-size: 20px; font-weight: 500; letter-spacing: -0.01em; }
 .sr-only {
   position: absolute;
@@ -514,7 +544,16 @@ table.pairs { width: 100%; min-width: 720px; border-collapse: collapse; font-var
 
 .shell.open .rep-main { padding-left: 0; padding-right: 0; }
 .shell.open .rep-main .hero { padding-left: 21px; padding-right: 21px; }
-.rep-plays { width: 100%; background: var(--white); }
+.dashboard-panel.rep-plays {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.shell.open .dashboard-panel.rep-plays {
+  padding-left: 21px;
+  padding-right: 21px;
+}
 .rep-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .rep-play {
   display: flex;
@@ -646,7 +685,10 @@ table.battle { width: 100%; min-width: 560px; border-collapse: collapse; font-si
 
 @media (max-width: 800px) {
   .shell.open { grid-template-columns: minmax(0, 0fr) minmax(0, 1fr); }
+  .shell.open .stage { visibility: hidden; }
   .goal-meter { display: none; }
+  .drawer-head { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .drawer-back { display: inline-flex; }
 }
 @media (max-width: 1240px) {
   .dashboard-summary {
@@ -715,6 +757,7 @@ table.battle { width: 100%; min-width: 560px; border-collapse: collapse; font-si
 
   .rep-play .row-name { font-size: 18px; }
   .shell.open .rep-main .hero { padding-left: 17px; padding-right: 17px; }
+  .shell.open .dashboard-panel.rep-plays { padding-left: 17px; padding-right: 17px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
